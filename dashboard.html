@@ -1,12 +1,18 @@
 <script type="module">
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 import { Octokit, App } from "https://cdn.skypack.dev/octokit";
+import { createAppAuth } from "https://cdn.skypack.dev/@octokit/auth-app"; //GitHubApp Auth Sucks
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 window.onload = async function()
 {
-    const octokit = new Octokit({ auth: "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" });
-    const { data: { login }, } = await octokit.rest.users.getAuthenticated();
-    console.log("Hello, %s", login);
+    //const octokit = new Octokit({ auth: "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" });
+    //const { data: { login }, } = await octokit.rest.users.getAuthenticated();
+    //console.log("Hello, %s", login);
+    const octokit = new Octokit({ authStrategy: createAppAuth,
+        auth: { appId: 229047, privateKey: rsa_key, installationId: 28303377 }}); //From the URL
     await get_actions(octokit, "TheMindVirusRKDA");
     //await get_status(octokit, "TheMindVirusRKDA");
 }
@@ -64,6 +70,39 @@ var get_state = async function(octokit, user, repo, sha)
     else if (commit.state == "failure") { colour = "#FF0033"; }
     document.body.innerHTML += '<p style="color: ' + colour + ';">' + user + '/' + repo + '</p>';
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+var rsa_key = `-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCslP4Cleiii22W
+gHlgHgFmG1R76+ujtTF0gym4Y8rTBGwGFNqrEZ6RHixx/bgGVWw8ii+muIIJj4x7
+yprjYdKPYwgLH6mIcPtzTWloMvCmOcXNA7FkAmlKh/9G1lIds4eZb4uwdNgLZbSe
+4h+owbmjqsdt8l606ESIG7SQ5sKzIqcoFavGBqgJP/ckj1S+pEGKImu7gQSGYymX
+70tqI84khxwfrn1V0cdCAkEf5U/Zr7iyFbIxSgDmKQ8RX5pA5CQRbf0f3BCHEjOa
+L2C3SpAD9ps13l/SVfLcITSIqQiGSMkP5jWiOIoPZCBUF/7xuJmMqI1daCgis5s6
+Lehxz0ldAgMBAAECggEBAItAbPSJIPyGpBYb89OqYlaRFsomwiuFuDHa4370hmNd
+3gvKJ+aAgQF250XTAvmZU4xFs81CcypjuWbpQ7DU7aDkt0jCc3i0MTAH9lUtRR/a
+3c9ee3PGvk51DXWK2Rc+FNupNX1byjboCaVpr0Hrjm6RDfmY5vHxt9pbAIcqq07+
+AuUqalv95sAgPhXdqPGEGAKXl5j7ZZAnT1fyEWmGxQ14lPmnvuOcoRCDpKxSJ7mR
+qjksdk6YJcyhLuYFwwCzDpAf4x9dOOBdmqY2OKETDXFRYxT7LZSaLBGIe8CLktXW
+zYssABgArnbO/Ic4NUKQhqfh+1qiIDOo/L9ibGl59cECgYEA4ixEn8UbBnEKHdMm
+uzBWqrL+FZXpgfdfQmFuIWHYgwPs8V31FhyDKrYxEBM8+4lWpGBY/1yZypc/mx4I
+YLy6iY+MPcaKGOsfhRoGHXDJVA0Ooa8dVIoq3aTKOZQhi3+lieBmzCB/VP6m3y1N
+R0n6IDj8iOuG0pyHu0KQJM7QT68CgYEAw1d2gBUsrtl5UuXqvFazycaRWT4N35uU
+IhW7mZgEbQiaABD65EOheCeQLcveh9gqHwiVgdLWORLZDaurTQEmqef6wDRe8Log
+GK14WnpEl2vzknnTsvr7cVXCRff6uuiJg6Yx+gZUF7/2ZxN7Vu9dc43g+7Vb0iBs
+jPgB8DH0DrMCgYBqN5P63Jx2h/vSSem0m1z4SZteE8tYCA6qpAsOjl8aGGvcZt3F
+BprrIikkfYR0NOmFxOHG+3wWUrXCaXZRyBBqrgmUsXsFfNaOscwRY3iJiqBGenDx
+1PmQoeV+6PxgARCDEen1D4X9KqK/yQyz4CAhpeGjg8kLfAuafAYp4x6dbQKBgDzs
+knDwKbd+7HAGdWe4Quqzm7GRwRH0nAblcFU/LGI1RJKwuQ9oaHvpGvatlwIXUUvM
+iZSsBVRXpIq29/5UVZK4X2SC8Plzk38e22Kcr7fqW1Vb2cMAtFtsu+LGrNSOohUF
+SKEKSEAABwGu+dDrZuIbZggbUEABDNoKn9AiRFQxAoGAIFHwNoYgIb2R8j1t0hl3
+JLKZrbbI7K/nVZjRhIyzOT2Y4wO44s+ha5nR+fJWT23SoMpateGOEuTN+bzFt8mn
+y3cvtCTg4vSTz8SgJtYDJpWU7iENV7x6qC/OdZJViAlLDM3kRwbtvV+GrzmCBLVR
+M9Fcp2ai5CDHho7JmL/j9bg=
+-----END PRIVATE KEY-----`;
+//openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in pkcs1.key -out pkcs8.key
+//openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in octokit-dashboard.2022-08-16.private-key.pem -out pkcs8.key
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 </script>
