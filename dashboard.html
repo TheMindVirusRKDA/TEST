@@ -1,0 +1,72 @@
+<script type="module">
+
+import { Octokit, App } from "https://cdn.skypack.dev/octokit";
+
+window.onload = async function()
+{
+    const octokit = new Octokit({ auth: "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" });
+    const { data: { login }, } = await octokit.rest.users.getAuthenticated();
+    console.log("Hello, %s", login);
+    await get_actions(octokit, "TheMindVirusRKDA");
+    //await get_status(octokit, "TheMindVirusRKDA");
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+var get_actions = async function(octokit, user)
+{
+    const response = await octokit.request("GET /users/{user}/repos",
+        { user: user });
+    for (var i in response.data) { await get_runs(octokit, user, response.data[i].name); }
+}
+
+var get_runs = async function(octokit, user, repo)
+{
+    const response = await octokit.request("GET /repos/{user}/{repo}/actions/runs",
+        { user: user, repo: repo });
+    var run = response.data.workflow_runs[0];
+    var colour = "#FF0000";
+    console.log(run);
+    if (run.status == "completed")
+    {
+        if (run.conclusion == "success") { colour = "#00FF00"; }
+        else if (run.conclusion == "cancelled") { colour = "#0000FF"; }
+    }
+    else if (run.status == "in_progress"){ colour = "#FFFF00"; } //Run Minecraft Server
+    document.body.innerHTML += '<p style="color: ' + colour + ';">' + user + '/' + repo + '</p>';
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+var get_status = async function(octokit, user)
+{
+    const response = await octokit.request("GET /users/{user}/repos",
+        { user: user });
+    for (var i in response.data) { await get_latest_commit(octokit, user, response.data[i].name); }
+}
+
+var get_latest_commit = async function(octokit, user, repo)
+{
+    const response = await octokit.request("GET /repos/{user}/{repo}/commits",
+        { user: user, repo: repo });
+    await get_state(octokit, user, repo, response.data[0].sha);
+}
+
+var get_state = async function(octokit, user, repo, sha)
+{
+    const response = await octokit.request("GET /repos/{user}/{repo}/commits/{sha}/status",
+        { user: user, repo: repo, sha: sha });
+    var commit = response.data;
+    console.log(commit);
+    var colour = "#FFFFFF";
+         if (commit.state == "success") { colour = "#00FF00"; }
+    else if (commit.state == "pending") { colour = "#FFFF00"; }
+    else if (commit.state == "failure") { colour = "#FF0033"; }
+    document.body.innerHTML += '<p style="color: ' + colour + ';">' + user + '/' + repo + '</p>';
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+</script>
+<style>
+body { background: #111111; color: white; font-family: consolas, sans-serif; white-space: pre-wrap; }
+</style>
